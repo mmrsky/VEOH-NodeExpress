@@ -4,24 +4,36 @@ const PORT = process.env.PORT || 8080;
 let app = express();
 
 app.use((req, res, next) => {
-    console.log('PATH: ' + req.path);
-    next();
-});
-app.use('/testi',(req, res, next) => {
-    console.log('moro');
+    console.log(`path: ${req.path}`);
     next();
 });
 
-app.get('/',(req, res, next) => {
-    res.send('Hello');
-    //res.end();
+app.use('/TEST', (req, res, next) => {
+    console.log('USE /TEST');
+    next();
+});
+
+app.get('/TEST/', (req, res, next) => {
+    console.log('GET /TEST');
+    next();
+});
+
+app.post('/TEST', (req, res, next) => {
+    console.log('POST /TEST');
+    next();
+});
+
+
+app.get('/', (req, res, next) => {
+    res.send(`Hello world 3`);
 });
 
 app.use((req, res, next) => {
-    console.log('404');
     res.status(404);
-    res.send(`<html>page not found</html>`);
-})
+    res.send(`
+        page not found
+    `);
+});
 
-
+//Shutdown server CTRL + C in terminal
 app.listen(PORT);
