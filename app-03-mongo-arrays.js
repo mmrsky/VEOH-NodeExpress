@@ -5,11 +5,25 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const note_schema = new Schema({
+    text: {
+        type: String,
+        required: true
+    }
+});
+const note_model = new mongoose.model('note', note_schema);
+
+
 const user_schema = new Schema({
     name: {
         type: String,
         required: true
-    }
+    },
+    notes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'note',
+        req: true
+    }]
 });
 const user_model = mongoose.model('user', user_schema);
 
@@ -61,10 +75,26 @@ app.get('/', is_logged_handler, (req, res, next) => {
         <form action="/logout" method="POST">
             <button type="submit">Log out</button>
         </form>
+        <form action="/add-note" method="POST">
+            <input type="text" name="note">
+            <button type="submit">Add note</button>
+        </form>
+        
+
     </html>
     </body>
     `);
     res.end();
+});
+
+app.post('/add-note', (req, res, next) => {
+    let new_note = note_model({
+        text: req.body.note
+    });
+    new_note.save().then(() => {
+        console.log('note saved');
+        return res.redirect('/');
+    });
 });
 
 app.post('/logout', (req, res, next) => {
@@ -137,6 +167,7 @@ app.use((req, res, next) => {
 //Shutdown server CTRL + C in terminal
 
 const mongoose_url = 'mongodb+srv://mmadmin:cXB7fY1GpNXd7k5Y@cluster0-2vmd2.mongodb.net/test?retryWrites=true&w=majority';
+
 mongoose.connect(mongoose_url, {
     useUnifiedTopology: true,
     useNewUrlParser: true
